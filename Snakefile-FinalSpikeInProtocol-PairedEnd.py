@@ -25,7 +25,7 @@ import argparse
 # Troubleshooting:
 # If a step needs more time or memory, edit slurmConfig.json
 #################################################################################
-sampleSheetPath = str('audrafiles-samplesheet.csv')
+sampleSheetPath = str('example-samplesheet.csv')
 
 # Alex's TODO: Move to config file (see "TODO below")
 ### General Dowen Lab setup:
