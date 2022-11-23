@@ -1,0 +1,30 @@
+{
+	"sampleInfoDelimiter" : "\t",
+	"baseNameColumns" : ["sample", "rep"],
+	"poolBaseNameColumns" : ["sample"],
+	"refGenome" : "mm10",
+	"spikeGenome" : "hg39",
+	"readLen" : 75,
+	"genome" : {
+		"mm10" : {
+			"bowtie" : "",
+			"fasta" : "",
+			"chrSize" : "",
+			"genomeSize" : 121400000
+		},
+		"hg39" : {
+			"bowtie" : "",
+			"fasta" : "",
+			"chrSize" : "",
+			"genomeSize" : 121400000
+		}
+	},
+	"module" : {
+		"bowtieVer" : "bowtie/1.3.1",
+		"samtoolsVer" : "samtools/1.10",
+		"fastqcVer" : "fastqc/0.11.7",
+		"bedtoolsVer" : "bedtools/2.25.0",
+		"macsVer" : "macs/2.1.2",
+		"ucscVer" : "ucsctools/320"
+	}
+}

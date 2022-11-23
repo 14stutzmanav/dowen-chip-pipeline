@@ -1,0 +1,21 @@
+{
+	"__default__" :
+	{
+		"time" : "00:30:00",
+		"threads" : "1",
+		"mem" : "8G"
+	},
+
+	"align" :
+	{
+		"time"	: "10:00:00",
+		"threads" : "12",
+		"mem" : "100G"
+	},
+
+	"convertToBigwig" :
+	{
+		"mail-type" : "end"
+	}
+
+}
