@@ -50,15 +50,17 @@ sampleDF = pd.read_csv(sampleSheetPath, comment = '#')
 sampleList = list(set(sampleDF.sampleName))
 
 def getsampleReplicates(wildcards):
-	readNumRegex = '_R{}'.format(wildcards.Num)
+        readNumRegex = '_R{}'.format(wildcards.Num)
+        sampleFilter = sampleDF[sampleDF.sampleName == wildcards.sample]
+        fastqList = list(sampleFilter.fastq)
+        fastqList = [ fastq for fastq in fastqList if re.search(readNumRegex, fastq) ]            
+        fastqList = [ 'Fastq/{}'.format(fastq) for fastq in fastqList ]
 
-	sampleFilter = sampleDF [ sampleDF.sampleName == wildcards.sample ]
-	fastqList = list(sampleFilter.fastq)
-	fastqList = [ fastq for fastq in fastqList 
-			if re.search(readNumRegex, fastq) ]
-	fastqList = [ 'Fastq/{}'.format(fastq) for fastq in fastqList ]
+        return(fastqList)
 
-	return(fastqList)
+#constrain the sample wildcard to characters, numbers, or underscore
+#wildcard_constraints:
+#    sample = '\w+'
 
 # TODO: Revise ref and spike genome to make "MergedGenomeforNormalization" each time the pipeline is run. This gives users flexibility to change ref and spike genomes easily.
 # REFGENOME = config['refGenome']
@@ -79,15 +81,21 @@ rule all:
 		expand('Fastq/{sample}_R{Num}.fastq.gz', sample = sampleList, Num = ['1', '2']),
 		expand('FastQC/{sample}_R1_fastqc.html', sample = sampleList),
 		expand('Sam/{sample}.sam', sample = sampleList),
-		expand('Bam/{sample}-sort.bam', sample = sampleList),
+		expand('Bam/{sample}-fixmate.bam', sample = sampleList),
 		expand('Bam/{sample}-fixmate_sort.bam', sample = sampleList),
+                expand('Bam/{sample}-notfixed-sort.bam', sample = sampleList),
+		expand('Bam/{sample}-notfixed-sortedbyname.bam', sample = sampleList),
+                expand('Bam/{sample}-markdup.bam', sample = sampleList),
 		expand('Bam/{sample}-markdup-sort.bam', sample = sampleList),
+                expand('Bam/{sample}-markdup-sort.bam.bai', sample = sampleList),
 		expand('Counts/{sample}-mousealign.txt', sample = sampleList),
+                expand('Bam/{sample}-mousereads.bam', sample = sampleList),
+                expand('Bam/{sample}-mousereads-fix.bam', sample = sampleList),
 		expand('Bam/{sample}-mousereads-fix-sort.bam', sample = sampleList),
 		expand('Bed/{sample}-fixall.bed', sample = sampleList),
 		expand('Counts/{sample}-NormFactor.txt', sample = sampleList),
 		expand('Bedgraph/{sample}-sort.bedgraph', sample = sampleList),
-		expand('Bigwig/{sample}.bw', sample = sampleList)
+        	expand('Bigwig/{sample}.bw', sample = sampleList)
 
 rule copyFiles:
 	input:
@@ -97,12 +105,9 @@ rule copyFiles:
 	message: "Copying files to Fastq directory with corrected file names."
         run:
 		for htsf in list(sampleDF.htsfFile):
-			#print('HERE', htsf)
 			outFileFilt = sampleDF [ sampleDF.htsfFile == htsf ] 
-			outFileBase = list(outFileFilt.fastq)[0]
+			outFileBase = list(outFileFilt.fastq)[0].split('.')[0]
 			outFile = 'Fastq/{fastq}.fastq.gz'.format(fastq = outFileBase)
-			#print('THERE')
-			#print(outFile)
 			shutil.copyfile(htsf, outFile)
 			print('copied file')
 
@@ -110,7 +115,7 @@ rule combinesampleReps:
 	input:
 		getsampleReplicates
 	output:
-		'Fastq/{sample}_R{Num,[12]}.fastq.gz'
+                'Fastq/{sample}_R{Num,[12]}.fastq.gz'
 	shell:
 		"""
 		cat {input} > {output}
@@ -155,7 +160,7 @@ rule convertToBamAndFix:
 		notfixed = 'Bam/{sample}-notfixed-sort.bam',
 		namesort = 'Bam/{sample}-notfixed-sortedbyname.bam',
 		fixmate = 'Bam/{sample}-fixmate.bam',
-		fixsort = 'Bam/{sample}-fixmate_sorted.bam',
+		fixsort = 'Bam/{sample}-fixmate_sort.bam',
 		dupsMarked = 'Bam/{sample}-markdup.bam',
 		dupsSort = 'Bam/{sample}-markdup-sort.bam',
 		index = 'Bam/{sample}-markdup-sort.bam.bai',
@@ -433,5 +438,3 @@ rule convertToBigwig:
 		"""
 		bedGraphToBigWig {input} ${params.chrom} {output}
 		"""
-
-
