@@ -12,7 +12,7 @@ Alternatively (if you're in the JDowen lab), you can copy `/proj/dowenlab/projec
 cp -r /proj/dowenlab/projects/new-dowen-ChIP-pipeline ./ && cd new-dowen-ChIP-pipeline
 ```
 
-#### ✌️ 2. Create `samplesheet.csv` ([see below](#sampleInfo)) with descriptive columns of data. 
+#### ✌️ 2. Create `samplesheet.csv` (see below) with descriptive columns of data. 
 You can make `samplesheet.csv` in excel and save the file as a `.csv` at the end. Each sample needs two rows of data (one for each end, R1 and R2). The example below (which is tab-deliminated for your ease of reading... note that the `.csv` would turn each tab to a `,`) is set up to run each lane (denoted L001 and L002 in the fastq file from HTSF) separately. 
 ```
 sampleName	fastq	htsfFile
@@ -61,7 +61,7 @@ nohup bash runSnakemake.sh Snakefile.py & disown
 
 ## Quick Troubleshooting:
 #### 🤔 If you're being told `snakmake` isn't found...
-...you forgot to load python. Check out step 4 then try to run the pipeline again. Good luck! 🤞🍀
+...you forgot to load `python`. Check out step 4 then try to run the pipeline again. Good luck! 🤞🍀
 
 #### 🤔 If you're being told there is already an instance of `snakemake` happening in your directory...
 1. Make absolutely certain no jobs from this pipeline are running in SLURM.
