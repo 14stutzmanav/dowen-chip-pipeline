@@ -59,12 +59,11 @@ nohup bash runSnakemake.sh Snakefile.py & disown
 ```
 
 
-## 🤔 Quick Troubleshooting:
-#### If you're being told `snakmake` isn't found...
-...you forgot to load python. Check out step 4.
+## Quick Troubleshooting:
+#### 🤔 If you're being told `snakmake` isn't found...
+...you forgot to load python. Check out step 4 then try to run the pipeline again. Good luck! 🤞🍀
 
-
-#### If you're being told there is already an instance of `snakemake` happening in your directory...
+#### 🤔 If you're being told there is already an instance of `snakemake` happening in your directory...
 1. Make absolutely certain no jobs from this pipeline are running in SLURM.
 2. Now, you need to unlock your working directory. To do so, run this:
 ```
@@ -72,8 +71,68 @@ bash unlockSnakemake.sh Snakefile.py
 ```
 Okay, now try to run the pipeline again. Good luck! 🤞🍀
 
-#### If you find that a job timed-out...
-1. Edit slurmConfig.json to increase the time allowed for jobs. There are 2 ways you can make this edit. Here's what slurmConfig.json looks like:
+#### 🤔 If you find that a job timed-out...
+First, you need to edit `slurmConfig.json` to increase the time allowed for jobs. Here's what that file looks like:
+```
+{
+	"__default__" :
+	{
+		"time" : "00:30:00",
+		"threads" : "1",
+		"mem" : "8G"
+	},
+
+	"align" :
+	{
+		"time"	: "10:00:00",
+		"threads" : "12",
+		"mem" : "100G"
+	},
+
+	"convertToBigwig" :
+	{
+		"mail-type" : "end"
+	}
+
+}
 ```
 
+Each set of bracketed parts with a title corresponds to different rules. At the top, you can see there's a set of paramaters called "__default__". This means that unless the rule is specifically named in a subsequent set of paramaters (so `align` and `convertToBigwig` in this example), then the default paramters will be used. Note that if `align` and `convertToBigwig` don't change the variables listed in `"__default__"`, they will still use the `"__default__"` paramaters.
+
+To increase the time needed for your rule, the best way to do that is setting up a new set of paramaters for that rule. This makes sure that other rules don't run with your increased time, which could penalize you in the SLURM queue and make your pipeline run slower. Note that if you need to inrease the time limit in align, you don't need to add a new section because `slurmConfig.json` already has paramaters listed for that rule. You can just edit the time requirements. Let's say, however, you need to add time to a different rule- as an example, we'll say that we need to let `callPeaks` run for an hour instead of 30min (like it would if it had default parameters). To do that, you would just edit slurmConfig.json to have the following:
 ```
+{
+	"__default__" :
+	{
+		"time" : "00:30:00",
+		"threads" : "1",
+		"mem" : "8G"
+	},
+
+	"align" :
+	{
+		"time"	: "10:00:00",
+		"threads" : "12",
+		"mem" : "100G"
+	},
+
+	"convertToBigwig" :
+	{
+		"mail-type" : "end"
+	},
+  
+  	"callPeaks" :
+	{
+		"time" : "1:00:00"
+	}
+
+}
+```
+Here, I added the paramaters I want for `callPeaks` to the end. Remember to add a comma after the `convertToBigwig` paramaters and make sure the brakets to all slurmConfig paramaters closes after the rule you just added.
+
+Okay, now you're ready to give the pipeline another shot. You'll probably have to unlock your working directory. To do so, make sure there are no jobs from this directory running in SLURM. Then, you unlock by running:
+```
+bash unlockSnakemake.sh Snakefile.py
+```
+
+Okay, now try to submit the pipeline again. Good luck! 🤞🍀
