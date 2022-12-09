@@ -71,3 +71,9 @@ nohup bash runSnakemake.sh Snakefile.py & disown
 bash unlockSnakemake.sh Snakefile.py
 ```
 Okay, now try to run the pipeline again. Good luck! 🤞🍀
+
+#### If you find that a job timed-out...
+1. Edit slurmConfig.json to increase the time allowed for jobs. There are 2 ways you can make this edit. Here's what slurmConfig.json looks like:
+```
+
+```
